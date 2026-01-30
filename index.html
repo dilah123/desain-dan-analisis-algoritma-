@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bahasa Traslate Bima ke Bahasa indonesia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #1e293b, #0f172a);
+            min-height: 100vh;
+            color: white;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+
+    <div class="w-full max-w-5xl">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+                Translate bahasa Bima(NTB) ke indonesia
+            </h1>
+            <p class="text-gray-400 text-lg">Platform Terjemahan Eksklusif Bahasa </p>
+        </div>
+
+        <div class="glass-effect rounded-[32px] p-8 glow">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2 text-blue-400 font-semibold">
+                        <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+                        <label>Bahasa Indonesia</label>
+                    </div>
+                    <textarea id="inputBox" oninput="doTranslate()" 
+                        class="w-full h-64 bg-white/5 border border-white/10 rounded-2xl p-6 text-xl focus:outline-none focus:border-blue-500 transition-all placeholder-gray-600"
+                        placeholder="Ketik kalimat di sini..."></textarea>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2 text-emerald-400 font-semibold">
+                        <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                        <label>Bahasa Bima (Mbojo)</label>
+                    </div>
+                    <div id="outputBox" 
+                        class="w-full h-64 bg-white/5 border border-white/10 rounded-2xl p-6 text-xl text-emerald-300 overflow-y-auto italic">
+                        Menunggu input...
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-8 flex justify-between items-center border-t border-white/10 pt-6">
+                <p class="text-gray-500 text-sm">Real-time String Matching Engine Aktif</p>
+                <button onclick="copyText()" 
+                    class="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-lg">
+                    Salin Terjemahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let typingTimer;
+        async function doTranslate() {
+            clearTimeout(typingTimer);
+            const val = document.getElementById('inputBox').value;
+            const outputBox = document.getElementById('outputBox');
+            
+            if(!val.trim()) { 
+                outputBox.innerText = "Menunggu input...";
+                outputBox.classList.add('opacity-50');
+                return; 
+            }
+
+            typingTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch('/translate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({query: val})
+                    });
+                    const data = await res.json();
+                    outputBox.innerText = data.hasil;
+                    outputBox.classList.remove('opacity-50');
+                } catch (e) {
+                    console.error("Error translation");
+                }
+            }, 300); // Delay kecil agar tidak terlalu berat saat mengetik
+        }
+        
+        function copyText() {
+            const txt = document.getElementById('outputBox').innerText;
+            if (txt && txt !== "Menunggu input...") {
+                navigator.clipboard.writeText(txt);
+                alert("Tersalin ke Clipboard!");
+            }
+        }
+    </script>
+</body>
+</html>
